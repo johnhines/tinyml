@@ -5,13 +5,12 @@
  *
  * @file neuron.c
  *
- * @brief Brief one-sentence description of what this file does.
+ * @brief Implements a simple neuron for learning purposes.
  *
- * @details Detailed explanation of the module's implementation, algorithms
- * used, hardware interactions, or design patterns if necessary.
+ * @details Implemented in C with a minimum of library calls.
  *
  * @author John Hines
- * @date 2026-09-17
+ * @date 2026-09-18
  *
  */
 
@@ -80,6 +79,7 @@ int main(void) {
   printf("w0 = %.6f\n", w0);
   printf("w1 = %.6f\n", w1);
   printf("b  = %.6f\n", b);
+  printf("\n");
 
   return (0);
 }
