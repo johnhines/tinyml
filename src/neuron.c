@@ -17,6 +17,16 @@
 
 #include <stdio.h>
 
+
+static double compute_loss(double w0, double w1, double y, double x0, double x1, double b)
+{
+  double y_hat = w0 * x0 + w1 * x1 - b;
+  double error = y_hat - y;
+
+  return error * error;
+}
+
+
 int main(void)
 {
   double x0 = 2.0;
@@ -31,7 +41,6 @@ int main(void)
 
   /*
   * Forward Pass 
-  *
   */
 
  double y_hat = w0*x0 + w1*x1 + b;
@@ -47,8 +56,9 @@ int main(void)
  printf("Target     = %f\n", y);
  printf("Loss       = %f\n", loss);
 
-  /*
-  * Backpropagation Pass
+
+
+  /* Backpropagation Pass
   */
 
   double dl_dy_hat = 2.0*error;
@@ -71,6 +81,30 @@ int main(void)
   printf("w1 = %f\n", w1);
   printf("b  = %f\n", b);
 
+
+  /* numerically check derivatives */
+
+  double epsilon = 1e-5;
+  
+  double w0_loss_plus = compute_loss(x0,x1,y,w0+epsilon,w1,b);
+  double w0_loss_minus = compute_loss(x0,x1,y,w0-epsilon,w1,b);
+  double numerical_dw0 = (w0_loss_plus-w0_loss_minus)/(2*epsilon);
+  
+  double w1_loss_plus = compute_loss(x0,x1,y,w0,w1+epsilon,b);
+  double w1_loss_minus = compute_loss(x0,x1,y,w0,w1-epsilon,b);
+  double numerical_dw1 = (w1_loss_plus - w1_loss_minus) / (2 * epsilon);
+
+  double b_loss_plus = compute_loss(x0,x1,y,w0,w1,b+epsilon);
+  double b_loss_minus = compute_loss(x0,x1,y,w0,w1,b-epsilon);
+  double numerical_db = (b_loss_plus - b_loss_minus) / (2 * epsilon);
+
+  printf("\nGradient Check\n");
+  printf("Parameter        Analytical        Numerical\n");
+  printf("w0               %f         %f\n",dl_dw0,numerical_dw0);
+  printf("w1               %f         %f\n",dl_dw1,numerical_dw1);
+  printf("b                %f         %f\n\n",dl_db,numerical_db);
+
+  
   return(0);
  
 }
