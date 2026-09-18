@@ -1,0 +1,71 @@
+# =========================
+# Compiled Object / Header Files
+# =========================
+*.o
+*.obj
+*.gch
+*.pch
+
+# =========================
+# Libraries & Shared Objects
+# =========================
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+
+# =========================
+# Executables & Binaries
+# =========================
+*.out
+bin/
+build/
+out/
+
+# =========================
+# CMake Build Artifacts
+# =========================
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_deps/
+cmake-build-*/
+
+# =========================
+# Debug & Profiling
+# =========================
+*.gcno
+*.gcda
+*.gcov
+gmon.out
+*.suo
+*.user
+*.aps
+
+# =========================
+# IDEs and Editors
+# =========================
+# Visual Studio
+.vs/
+x64/
+Debug/
+Release/
+
+# JetBrains (CLion, etc.)
+.idea/
+
+# VS Code
+.vscode/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Vim / Emacs swap files
+*.swp
+*.swo
+*~
