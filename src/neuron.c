@@ -17,15 +17,16 @@
 
 #include <stdio.h>
 
-static double compute_loss(double w0, double w1, double y, double x0, double x1,
+static double compute_loss(double x0, double x1, double y, double w0, double w1,
                            double b) {
-  double y_hat = w0 * x0 + w1 * x1 - b;
+  double y_hat = (w0 * x0) + (w1 * x1) + b;
   double error = y_hat - y;
 
-  return error * error;
+  return (error * error);
 }
 
 int main(void) {
+
   double x0 = 2.0;
   double x1 = 3.0;
   double y = -4.0;
@@ -36,16 +37,9 @@ int main(void) {
 
   double learning_rate = 0.01;
 
-  /*
-   * Forward Pass
-   */
+  /* Forward Pass */
 
-  double y_hat = w0 * x0 + w1 * x1 + b;
-
-  /*
-   * Squared Error Loss
-   */
-
+  double y_hat = (w0 * x0) + (w1 * x1) + b;
   double error = y_hat - y;
   double loss = error * error;
 
@@ -53,11 +47,9 @@ int main(void) {
   printf("Target     = %f\n", y);
   printf("Loss       = %f\n", loss);
 
-  /* Backpropagation Pass
-   */
+  /* Backpropagation Pass */
 
   double dl_dy_hat = 2.0 * error;
-
   double dl_dw0 = dl_dy_hat * x0;
   double dl_dw1 = dl_dy_hat * x1;
   double dl_db = dl_dy_hat;
@@ -67,14 +59,6 @@ int main(void) {
   printf("dl/dw1 = %f\n", dl_dw1);
   printf("dl/db = %f\n", dl_db);
 
-  w0 -= learning_rate * dl_dw0;
-  w1 -= learning_rate * dl_dw1;
-  b -= learning_rate * dl_db;
-
-  printf("\nUpdated Parameters\n");
-  printf("w0 = %f\n", w0);
-  printf("w1 = %f\n", w1);
-  printf("b  = %f\n", b);
 
   /* numerically check derivatives */
 
@@ -97,6 +81,18 @@ int main(void) {
   printf("w0               %f         %f\n", dl_dw0, numerical_dw0);
   printf("w1               %f         %f\n", dl_dw1, numerical_dw1);
   printf("b                %f         %f\n\n", dl_db, numerical_db);
+
+
+  /* Update Parameters */
+
+  w0 -= learning_rate * dl_dw0;
+  w1 -= learning_rate * dl_dw1;
+  b -= learning_rate * dl_db;
+
+  printf("\nUpdated Parameters\n");
+  printf("w0 = %f\n", w0);
+  printf("w1 = %f\n", w1);
+  printf("b  = %f\n", b);
 
   return (0);
 }
