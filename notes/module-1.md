@@ -461,3 +461,274 @@ $$
 \boxed{y=2x_0-3x_1+1}.
 $$
 
+Excellent. That means the analytical backpropagation and the independent numerical calculation agree at the same parameter values.
+
+There's an important lesson from the bug you just found: **a gradient only describes the slope at one particular point in parameter space.** Once we update the parameters, we're at a new point, and the gradients generally change.
+
+## Module 1.3 — Learning from multiple examples
+
+Now let's make the neuron actually learn the hidden function
+
+$$
+\boxed{y=2x_0-3x_1+1}.
+$$
+
+We'll give it several examples generated from that rule:
+
+| \(x_0\) | \(x_1\) | \(y\) |
+| ------: | ------: | ----: |
+|       0 |       0 |     1 |
+|       1 |       0 |     3 |
+|       0 |       1 |    -2 |
+|       1 |       1 |     0 |
+|       2 |       1 |     2 |
+|       1 |       2 |    -3 |
+
+The neuron doesn't know the rule. It sees only those input/output pairs.
+
+### Representing our dataset
+
+For now, let's resist making a dataset abstraction. Add three arrays:
+
+```c
+double x0_data[] = {0.0, 1.0, 0.0, 1.0, 2.0, 1.0};
+double x1_data[] = {0.0, 0.0, 1.0, 1.0, 1.0, 2.0};
+double y_data[]  = {1.0, 3.0, -2.0, 0.0, 2.0, -3.0};
+
+size_t n = 6;
+```
+
+You'll need:
+
+```c
+#include <stddef.h>
+```
+
+although `stdio.h` commonly brings in definitions indirectly; it's better not to depend on that.
+
+Now training consists of repeatedly visiting these examples.
+
+## One training example
+
+For example \(i\), the forward pass is:
+
+```c
+double x0 = x0_data[i];
+double x1 = x1_data[i];
+double y  = y_data[i];
+
+double y_hat = w0 * x0 + w1 * x1 + b;
+double error = y_hat - y;
+double loss = error * error;
+```
+
+And our gradients remain exactly what we derived:
+
+```c
+double dL_dy_hat = 2.0 * error;
+
+double dL_dw0 = dL_dy_hat * x0;
+double dL_dw1 = dL_dy_hat * x1;
+double dL_db  = dL_dy_hat;
+```
+
+Then:
+
+```c
+w0 -= learning_rate * dL_dw0;
+w1 -= learning_rate * dL_dw1;
+b  -= learning_rate * dL_db;
+```
+
+Nothing about the calculus changed just because we now have multiple examples.
+
+## Introducing an epoch
+
+One complete trip through the training dataset is called an **epoch**.
+
+So our loop structure becomes:
+
+```c
+for (size_t epoch = 0; epoch < epochs; ++epoch) {
+
+    for (size_t i = 0; i < n; ++i) {
+
+        /* forward */
+
+        /* backward */
+
+        /* update */
+    }
+}
+```
+
+This is our first real training loop.
+
+Set:
+
+```c
+size_t epochs = 1000;
+double learning_rate = 0.01;
+```
+
+Don't worry yet about whether 1000 or 0.01 are "correct." Learning rate selection is something we'll investigate.
+
+### Track the loss
+
+There's one more useful addition.
+
+At the beginning of each epoch:
+
+```c
+double total_loss = 0.0;
+```
+
+For every example:
+
+```c
+total_loss += loss;
+```
+
+Then calculate the average:
+
+```c
+double mean_loss = total_loss / (double)n;
+```
+
+Print it periodically rather than 1000 times:
+
+```c
+if (epoch % 100 == 0) {
+    printf("epoch %zu: loss = %.10f\n",
+           epoch, mean_loss);
+}
+```
+
+One subtlety: because we're updating the weights after every example, this `mean_loss` combines losses evaluated at slightly different parameter values during the epoch. That's perfectly adequate for watching training right now. Later we'll be more precise about training metrics.
+
+## What kind of gradient descent did we just implement?
+
+Notice this:
+
+```text
+example 0 -> gradient -> UPDATE
+example 1 -> gradient -> UPDATE
+example 2 -> gradient -> UPDATE
+...
+```
+
+We're updating after **each individual example**.
+
+That's stochastic gradient descent, or more precisely single-example SGD in our current setup.
+
+Another possibility would be:
+
+```text
+example 0 -> gradient --\
+example 1 -> gradient ---\
+example 2 -> gradient ----+-> average gradients -> ONE UPDATE
+example 3 -> gradient ---/
+...
+```
+
+That's batch gradient descent if we use the entire dataset.
+
+And later:
+
+```text
+32 examples -> average gradients -> update
+32 examples -> average gradients -> update
+32 examples -> average gradients -> update
+```
+
+is **mini-batch gradient descent**, which is what we'll eventually want.
+
+But don't implement batches yet.
+
+## What should happen?
+
+After training, print:
+
+```c
+printf("\nlearned parameters:\n");
+printf("w0 = %.6f\n", w0);
+printf("w1 = %.6f\n", w1);
+printf("b  = %.6f\n", b);
+```
+
+Remember the hidden function was
+
+$$
+y=2x_0-3x_1+1.
+$$
+
+Therefore, we'd like training to discover approximately
+
+$$
+w_0\approx2
+$$
+
+$$
+w_1\approx-3
+$$
+
+$$
+b\approx1.
+$$
+
+That correspondence is worth appreciating:
+
+$$
+\underbrace{y=2x_0-3x_1+1}_{\text{function that generated our data}}
+$$
+
+versus
+
+$$
+\underbrace{\hat y=w_0x_0+w_1x_1+b}_{\text{model}}
+$$
+
+Training is searching for parameters that make the second expression reproduce the first.
+
+### One experiment I want you to do
+
+After it works, change the initial parameters substantially. For example:
+
+```c
+double w0 = -4.0;
+double w1 =  2.5;
+double b  = -1.0;
+```
+
+Run it again.
+
+Then try:
+
+```c
+double w0 = 10.0;
+double w1 = -8.0;
+double b  = 5.0;
+```
+
+Observe whether the parameters still approach \(2,-3,1\), and watch how the loss behaves.
+
+Also try changing:
+
+```c
+double learning_rate = 0.01;
+```
+
+to values such as:
+
+```text
+0.001
+0.1
+1.0
+```
+
+Do these one at a time.
+
+**Pay particular attention to `1.0`.** Don't assume a larger learning rate means faster learning. If you see enormous values, `inf`, or `nan`, that's an important result rather than a failed experiment.
+
+Once you've run those experiments, tell me what happened—especially with the different learning rates. From those observations we'll develop an intuitive and mathematical picture of **why gradient descent converges, oscillates, or explodes** before moving beyond our single neuron.
+

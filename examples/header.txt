@@ -1,0 +1,17 @@
+/*
+ * SPDX-FileCopyrightText: 2026 John Hines 
+ * SPDX-License-Identifier: MIT
+ *
+ * @file filename.cpp
+ *  
+ * @brief Brief one-sentence description of what this file does.
+ *
+ * @details Detailed explanation of the module's implementation, algorithms used, 
+ *          hardware interactions, or design patterns if necessary.
+ *
+ * @author John Hines
+ * @date 2026-09-17
+ * 
+ */
+
+

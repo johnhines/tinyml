@@ -1,7 +1,7 @@
 CC := cc
 
-TARGET := build/neuron
-SRC := src/neuron.c
+TARGET := build/neuron build/vector
+SRC := examples/neuron.c examples/vector.c
 
 CFLAGS := \
 	-std=c17 \
@@ -12,7 +12,12 @@ CFLAGS := \
 	-Wconversion
 
 
-$(TARGET): $(SRC) | build
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) 
+all: build/neuron build/vector
+
+build/%:	examples/%.c 
+	$(CC) $(CFLAGS) $< -o $@
+
+# $(TARGET): $(SRC) | build
+# 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) 
 
 
