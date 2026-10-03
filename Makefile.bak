@@ -1,0 +1,25 @@
+CC := cc
+
+TARGET := build/neuron build/vector
+SRC := examples/neuron.c examples/vector.c
+INCLUDE := include 
+
+CFLAGS := \
+	-std=c17 \
+	-Wall \
+	-Wextra \
+	-Wpedantic \
+	-Wshadow \
+	-Wconversion \
+	-I$(INCLUDE)
+
+
+all: build/neuron build/vector
+
+build/%:	examples/%.c 
+	$(CC) $(CFLAGS) $< -o $@
+
+# $(TARGET): $(SRC) | build
+# 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) 
+
+

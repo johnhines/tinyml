@@ -1,9 +1,14 @@
 CC := cc
 
-TARGET := build/neuron build/vector
-SRC := examples/neuron.c examples/vector.c
+TARGET := build/02_matrix
 
-CFLAGS := \
+SRC := \
+	examples/02_matrix.c \
+	src/matrix.c
+
+CPPFLAGS := -Iinclude
+
+CFLAGS_COMMON := \
 	-std=c17 \
 	-Wall \
 	-Wextra \
@@ -11,13 +16,34 @@ CFLAGS := \
 	-Wshadow \
 	-Wconversion
 
+CFLAGS_DEBUG := -O0 -g3
+CFLAGS_RELEASE := -O2 -DNDEBUG
+CFLAGS_SANITIZE := -O0 -g3 -fsanitize=address,undefined
 
-all: build/neuron build/vector
+.PHONY: all debug release sanitize run clean
 
-build/%:	examples/%.c 
-	$(CC) $(CFLAGS) $< -o $@
+all: debug
 
-# $(TARGET): $(SRC) | build
-# 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) 
+debug: CFLAGS := $(CFLAGS_COMMON) $(CFLAGS_DEBUG)
+debug: $(TARGET)
+
+release: CFLAGS := $(CFLAGS_COMMON) $(CFLAGS_RELEASE)
+release: clean $(TARGET)
+
+sanitize: CFLAGS := $(CFLAGS_COMMON) $(CFLAGS_SANITIZE)
+sanitize: LDFLAGS := -fsanitize=address,undefined
+sanitize: clean $(TARGET)
+
+$(TARGET): $(SRC) | build
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
+
+build:
+	mkdir -p build
+
+run: debug
+	./$(TARGET)
+
+clean:
+	rm -rf build
 
 
