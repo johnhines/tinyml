@@ -73,3 +73,28 @@ void matrix_mul(const Matrix* a, const Matrix* b, Matrix* out) {
     }
   }
 }
+
+void matrix_add(const Matrix* a, const Matrix* b, Matrix* out) {
+  if (a->rows != b->rows || a->cols != b->cols) {
+    fprintf(stderr, "matrix_add(): incompatible dimensions\n");
+    exit(EXIT_FAILURE);
+  }
+
+  size_t n = a->rows * a->cols;
+
+  // assumes data is stored row-major order
+  for (size_t i = 0; i < n; i++) {
+    out->data[i] = a->data[i] + b->data[i];
+  }
+}
+
+void matrix_transpose(const Matrix* a, Matrix* out) {
+  size_t rows = a->rows;
+  size_t cols = a->cols;
+
+  for (size_t i = 0; i < rows; i++) {
+    for (size_t j = 0; j < cols; j++) {
+      out->data[j * rows + i] = a->data[i * cols + j];
+    }
+  }
+}

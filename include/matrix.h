@@ -1,7 +1,7 @@
 
 #ifndef MATRIX_H
-
 #define MATRIX_H
+
 #include <stddef.h>
 
 typedef struct {
@@ -23,3 +23,7 @@ void matrix_set(Matrix* matrix, size_t row, size_t col, double value);
 void matrix_print(const Matrix* matrix);
 
 void matrix_mul(const Matrix* a, const Matrix* b, Matrix* out);
+
+void matrix_add(const Matrix* a, const Matrix* b, Matrix* out);
+
+void matrix_transpose(const Matrix* a, Matrix* out);

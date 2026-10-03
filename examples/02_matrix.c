@@ -3,12 +3,13 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "matrix.h"
+#include "../include/matrix.h"
 
 int main(void) {
   Matrix a = matrix_create(2, 3);
   Matrix b = matrix_create(3, 2);
   Matrix c = matrix_create(2, 2);
+  Matrix At = matrix_create(3, 2);
 
   /* initialize a */
 
@@ -35,12 +36,17 @@ int main(void) {
   matrix_print(&b);
 
   matrix_mul(&a, &b, &c);
-
+  printf("Matrix C:");
   matrix_print(&c);
+
+  matrix_transpose(&a, &At);
+  printf("A transpose:");
+  matrix_print(&At);
 
   matrix_free(&a);
   matrix_free(&b);
   matrix_free(&c);
+  matrix_free(&At);
 
   return (0);
 }

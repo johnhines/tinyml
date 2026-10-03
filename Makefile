@@ -1,49 +1,71 @@
 CC := cc
 
-TARGET := build/02_matrix
-
-SRC := \
-	examples/02_matrix.c \
-	src/matrix.c
-
 CPPFLAGS := -Iinclude
 
-CFLAGS_COMMON := \
+CFLAGS := \
 	-std=c17 \
 	-Wall \
 	-Wextra \
 	-Wpedantic \
 	-Wshadow \
-	-Wconversion
+	-Wconversion \
+	-O0 \
+	-g3
 
-CFLAGS_DEBUG := -O0 -g3
-CFLAGS_RELEASE := -O2 -DNDEBUG
-CFLAGS_SANITIZE := -O0 -g3 -fsanitize=address,undefined
+BUILD_DIR := build
 
-.PHONY: all debug release sanitize run clean
+.PHONY: all clean \
+	01_neuron 02_matrix 03_dense \
+	run-01_neuron run-02_matrix run-03_dense
 
-all: debug
+all: 01_neuron 02_matrix 03_dense
 
-debug: CFLAGS := $(CFLAGS_COMMON) $(CFLAGS_DEBUG)
-debug: $(TARGET)
 
-release: CFLAGS := $(CFLAGS_COMMON) $(CFLAGS_RELEASE)
-release: clean $(TARGET)
+# ------------------------------------------------------------
+# Example targets
+# ------------------------------------------------------------
 
-sanitize: CFLAGS := $(CFLAGS_COMMON) $(CFLAGS_SANITIZE)
-sanitize: LDFLAGS := -fsanitize=address,undefined
-sanitize: clean $(TARGET)
+01_neuron: $(BUILD_DIR)/01_neuron
 
-$(TARGET): $(SRC) | build
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
+02_matrix: $(BUILD_DIR)/02_matrix
 
-build:
-	mkdir -p build
+03_dense: $(BUILD_DIR)/03_dense
 
-run: debug
-	./$(TARGET)
+
+# ------------------------------------------------------------
+# Executables
+# ------------------------------------------------------------
+
+$(BUILD_DIR)/01_neuron: examples/01_neuron.c | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $< -o $@
+
+$(BUILD_DIR)/02_matrix: examples/02_matrix.c src/matrix.c | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $^ -o $@
+
+$(BUILD_DIR)/03_dense: examples/03_dense.c src/matrix.c | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $^ -o $@
+
+
+# ------------------------------------------------------------
+# Run targets
+# ------------------------------------------------------------
+
+run-01_neuron: 01_neuron
+	./$(BUILD_DIR)/01_neuron
+
+run-02_matrix: 02_matrix
+	./$(BUILD_DIR)/02_matrix
+
+run-03_dense: 03_dense
+	./$(BUILD_DIR)/03_dense
+
+
+# ------------------------------------------------------------
+# Build directory / cleanup
+# ------------------------------------------------------------
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
 clean:
-	rm -rf build
-
-
+	rm -rf $(BUILD_DIR)
